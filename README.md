@@ -1,48 +1,51 @@
 # property-listing-frontend
-Property Listing Backend API
-This repository contains the backend server for the "Mini Property Listing Dashboard," a project developed for a React Developer skill assessment.
-This server is built with Node.js and Express and uses Google Firestore for data persistence. It provides a clean, RESTful API that allows the frontend application to perform CRUD (Create, Read, Delete) operations on property listings.
+Property Listing Frontend UI
+This repository contains the frontend UI for the "Mini Property Listing Dashboard," a project developed for a React Developer skill assessment.
 
-Live API Base URL
-The live version of this API is hosted on Render:
-https://property-listing-backend-z97s.onrender.com
+This is a single-page application built with React (using CDN links) and styled with Tailwind CSS. It provides a modern, responsive interface for users to interact with property data. The application is fully decoupled from the backend and communicates via a RESTful API to fetch, display, add, and delete property listings.
+
+Live Site URL
+The live version of this frontend is hosted on Netlify:
+[https://<your-netlify-site-name>.netlify.app](https://property-listing-app.netlify.app/)
 
 Core Technologies
-Runtime: Node.js
-Framework: Express.js
-Database: Google Firestore (via Firebase Admin SDK)
-Middleware: CORS for handling cross-origin requests
+Library: React
 
-API Endpoints
-The server exposes the following endpoints:
+Styling: Tailwind CSS
 
-GET /api/properties
-Fetches all property listings from the database.
+HTTP Client: Native Fetch API
 
-POST /api/properties
-Adds a new property listing to the database. Expects a JSON body with name, type, price, location, and description.
+Features
+View and filter property listings in real-time.
 
-DELETE /api/properties/:id
-Deletes a specific property by its unique ID.
+Search properties by name or location.
+
+Add new properties via a sleek, modern form.
+
+Delete existing properties with a confirmation step.
+
+View property details in an elegant modal window.
+
+Fully responsive design with a dark mode option.
+
+Subtle animations for a smoother user experience.
 
 Local Setup and Installation
-To run this server on your local machine, please follow these steps:
+To run this frontend on your local machine, please follow these steps:
+
+Prerequisites
+
+Ensure the backend server is running first, as this application depends on its API.
 
 Clone the Repository
+
 git clone <your-repo-url>
-cd property-listing-backend
+cd property-listing-frontend
 
-Install Dependencies
-npm install
+Run the Application
 
-Set Up Firebase Admin Credentials
-Go to your Firebase project settings and navigate to the "Service Accounts" tab.
+No build step or local server is required. Simply open the index.html file in your web browser.
 
-Click "Generate new private key" to download your unique credentials file.
-Place this file in the root of the project directory and rename it to serviceAccountKey.json.
-Security Note: This file is included in .gitignore and must never be committed to a public repository.
+Connect to the Backend
 
-Start the Server
-node index.js
-
-The server will start and listen for requests on http://localhost:3001.
+Inside the index.html file, make sure the API_BASE_URL constant points to the correct address of your running backend server (e.g., http://localhost:3001 for local development or the live Render URL for production).
