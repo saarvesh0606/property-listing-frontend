@@ -58,7 +58,7 @@
 
     <!-- Your React Application Code -->
     <script type="text/babel" data-presets="react">
-        const { useState, useEffect, useMemo, StrictMode } = React;
+        const { useState, useEffect, useMemo, StrictMode, Fragment } = React;
         const { createRoot } = ReactDOM;
 
         const API_BASE_URL = 'https://property-listing-backend-z97s.onrender.com'; 
@@ -75,7 +75,7 @@
         const PropertyCard = ({ property, onView, onDelete, style }) => (
             <div style={style} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
                 <div className="relative">
-                    <img src={property.image} alt={property.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <img src={property.image || `https://placehold.co/600x400/cccccc/333?text=${encodeURIComponent(property.name)}`} alt={property.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 p-4">
                         <h3 className="text-xl font-bold text-white">{property.name}</h3>
@@ -86,7 +86,7 @@
                     </button>
                 </div>
                 <div className="p-4">
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 h-10">{property.description.substring(0, 80)}...</p>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 h-10">{property.description ? property.description.substring(0, 80) + '...' : 'No description available.'}</p>
                     <div className="flex justify-between items-center">
                         <p className="text-xl font-extrabold text-blue-600 dark:text-blue-400">₹{property.price.toLocaleString('en-IN')}</p>
                         <button onClick={() => onView(property)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
@@ -100,10 +100,10 @@
         const ViewDetailsModal = ({ property, onClose }) => {
             if (!property) return null;
             return ReactDOM.createPortal(
-                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50 p-4 animate-fade-in-up" style={{ animationDuration: '0.3s' }}>
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden">
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50 p-4 animate-fade-in-up" style={{ animationDuration: '0.3s' }} onClick={onClose}>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden" onClick={e => e.stopPropagation()}>
                         <div className="relative">
-                            <img src={property.image} alt={property.name} className="w-full h-72 object-cover"/>
+                            <img src={property.image || `https://placehold.co/800x400/cccccc/333?text=${encodeURIComponent(property.name)}`} alt={property.name} className="w-full h-72 object-cover"/>
                             <button onClick={onClose} className="absolute top-4 right-4 bg-white/20 text-white rounded-full p-2 hover:bg-white/40 transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
@@ -116,6 +116,11 @@
                                 <span className="ml-3">{property.location}</span>
                             </div>
                             <p className="text-gray-700 dark:text-gray-300 mb-6 text-lg leading-relaxed">{property.description}</p>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-center">
+                                {property.bedrooms && <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"><p className="font-bold text-lg">{property.bedrooms}</p><p className="text-sm text-gray-500 dark:text-gray-400">Bedrooms</p></div>}
+                                {property.bathrooms && <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"><p className="font-bold text-lg">{property.bathrooms}</p><p className="text-sm text-gray-500 dark:text-gray-400">Bathrooms</p></div>}
+                                {property.area && <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"><p className="font-bold text-lg">{property.area} <span className="text-xs">sq.ft.</span></p><p className="text-sm text-gray-500 dark:text-gray-400">Area</p></div>}
+                            </div>
                             <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">₹{property.price.toLocaleString('en-IN')}</p>
                         </div>
                     </div>
@@ -125,32 +130,72 @@
         };
 
         const AddPropertyForm = ({ onAdd, onCancel, isSubmitting }) => {
-            const [name, setName] = useState('');
-            const [type, setType] = useState('Plot');
-            const [price, setPrice] = useState('');
-            const [location, setLocation] = useState('');
-            const [description, setDescription] = useState('');
+            const [property, setProperty] = useState({
+                name: '',
+                type: 'House',
+                location: '',
+                price: '',
+                bedrooms: '',
+                bathrooms: '',
+                area: '',
+                image: '',
+                description: ''
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setProperty(prev => ({ ...prev, [name]: value }));
+            };
 
             const handleSubmit = (e) => {
                 e.preventDefault();
-                if (!name || !price || !location || !description) return;
-                onAdd({ name, type, price: Number(price), location, description });
+                if (!property.name || !property.price || !property.location) return;
+                onAdd({ ...property, price: Number(property.price) });
             };
 
             return (
-                <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl animate-fade-in-up">
-                    <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Add a New Property</h2>
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <input type="text" placeholder="Property Name" value={name} onChange={e => setName(e.target.value)} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                        <select value={type} onChange={e => setType(e.target.value)} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none">
-                            <option value="Plot">Plot</option>
-                            <option value="Shed">Shed</option>
-                            <option value="Retail Store">Retail Store</option>
-                        </select>
-                        <input type="number" placeholder="Price (INR)" value={price} onChange={e => setPrice(e.target.value)} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                        <input type="text" placeholder="Location (e.g., City, State)" value={location} onChange={e => setLocation(e.target.value)} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                        <textarea placeholder="Full Description" value={description} onChange={e => setDescription(e.target.value)} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows={4}></textarea>
-                        <div className="flex justify-end space-x-4 pt-2">
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl animate-fade-in-up max-w-4xl mx-auto">
+                    <h2 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white text-center">List a New Property</h2>
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <div>
+                            <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300 border-b pb-2">Basic Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <input type="text" name="name" placeholder="Property Name (e.g., Elysian Towers)" value={property.name} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                                <input type="text" name="location" placeholder="Location (e.g., Koregaon Park, Pune)" value={property.location} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300 border-b pb-2">Property Details</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <select name="type" value={property.type} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
+                                    <option>House</option>
+                                    <option>Apartment</option>
+                                    <option>Villa</option>
+                                    <option>Bungalow</option>
+                                    <option>Plot</option>
+                                    <option>Retail Store</option>
+                                </select>
+                                <input type="number" name="bedrooms" placeholder="Bedrooms" value={property.bedrooms} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                <input type="number" name="bathrooms" placeholder="Bathrooms" value={property.bathrooms} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                <input type="number" name="area" placeholder="Area (sq. ft.)" value={property.area} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            </div>
+                        </div>
+                        
+                        <div>
+                             <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300 border-b pb-2">Media & Description</h3>
+                             <div className="space-y-6">
+                                <input type="text" name="image" placeholder="Image URL (e.g., https://...)" value={property.image} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                <textarea name="description" placeholder="Full Description" value={property.description} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" rows={4}></textarea>
+                             </div>
+                        </div>
+
+                        <div>
+                            <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300 border-b pb-2">Pricing</h3>
+                             <input type="number" name="price" placeholder="Price (INR)" value={property.price} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                        </div>
+
+                        <div className="flex justify-end space-x-4 pt-4">
                             <button type="button" onClick={onCancel} disabled={isSubmitting} className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50">Cancel</button>
                             <button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 shadow-lg hover:shadow-xl">
                                 {isSubmitting ? 'Submitting...' : 'Add Property'}
@@ -304,7 +349,7 @@
                                 isSubmitting={isSubmitting} 
                             />
                         ) : (
-                            <React.Fragment>
+                            <Fragment>
                                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md mb-10">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="relative">
@@ -315,15 +360,18 @@
                                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><FilterIcon /></div>
                                             <select value={filterType} onChange={e => setFilterType(e.target.value)} className="w-full p-4 pl-12 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none">
                                                 <option value="All">All Property Types</option>
+                                                <option value="House">House</option>
+                                                <option value="Apartment">Apartment</option>
+                                                <option value="Villa">Villa</option>
+                                                <option value="Bungalow">Bungalow</option>
                                                 <option value="Plot">Plot</option>
-                                                <option value="Shed">Shed</option>
                                                 <option value="Retail Store">Retail Store</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                                 {renderContent()}
-                            </React.Fragment>
+                            </Fragment>
                         )}
                         
                         {/* Add Property Button for Mobile */}
