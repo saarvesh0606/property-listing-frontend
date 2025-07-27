@@ -82,13 +82,13 @@
                         <p className="text-sm text-blue-200">{property.location}</p>
                     </div>
                      <button onClick={() => onDelete(property.id)} className="absolute top-3 right-3 p-2 bg-red-600/80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-700">
-                        <TrashIcon />
+                         <TrashIcon />
                     </button>
                 </div>
                 <div className="p-4">
                     <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 h-10">{property.description.substring(0, 80)}...</p>
                     <div className="flex justify-between items-center">
-                        <p className="text-xl font-extrabold text-blue-600 dark:text-blue-400">${property.price.toLocaleString()}</p>
+                        <p className="text-xl font-extrabold text-blue-600 dark:text-blue-400">₹{property.price.toLocaleString('en-IN')}</p>
                         <button onClick={() => onView(property)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
                             View Details
                         </button>
@@ -116,7 +116,7 @@
                                 <span className="ml-3">{property.location}</span>
                             </div>
                             <p className="text-gray-700 dark:text-gray-300 mb-6 text-lg leading-relaxed">{property.description}</p>
-                            <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">${property.price.toLocaleString()}</p>
+                            <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">₹{property.price.toLocaleString('en-IN')}</p>
                         </div>
                     </div>
                 </div>,
@@ -147,7 +147,7 @@
                             <option value="Shed">Shed</option>
                             <option value="Retail Store">Retail Store</option>
                         </select>
-                        <input type="number" placeholder="Price ($)" value={price} onChange={e => setPrice(e.target.value)} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                        <input type="number" placeholder="Price (INR)" value={price} onChange={e => setPrice(e.target.value)} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                         <input type="text" placeholder="Location (e.g., City, State)" value={location} onChange={e => setLocation(e.target.value)} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                         <textarea placeholder="Full Description" value={description} onChange={e => setDescription(e.target.value)} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows={4}></textarea>
                         <div className="flex justify-end space-x-4 pt-2">
@@ -268,8 +268,8 @@
                 }
                 return (
                      <div className="text-center py-24 animate-fade-in-up">
-                        <h3 className="text-3xl font-semibold text-gray-700 dark:text-gray-300">No Properties Found</h3>
-                        <p className="text-gray-500 mt-4">Try adjusting your filters or add a new property!</p>
+                         <h3 className="text-3xl font-semibold text-gray-700 dark:text-gray-300">No Properties Found</h3>
+                         <p className="text-gray-500 mt-4">Try adjusting your filters or add a new property!</p>
                     </div>
                 );
             }
