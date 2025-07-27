@@ -75,7 +75,7 @@
         const PropertyCard = ({ property, onView, onDelete, style }) => (
             <div style={style} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
                 <div className="relative">
-                    <img src={property.image || `https://placehold.co/600x400/cccccc/333?text=${encodeURIComponent(property.name)}`} alt={property.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <img src={property.image || `https://placehold.co/600x400/cccccc/333?text=${encodeURIComponent(property.name)}`} alt={property.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" onError={(e) => { e.target.onerror = null; e.target.src=`https://placehold.co/600x400/ff0000/FFFFFF?text=Image+Error`; }}/>
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 p-4">
                         <h3 className="text-xl font-bold text-white">{property.name}</h3>
@@ -88,7 +88,7 @@
                 <div className="p-4">
                     <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 h-10">{property.description ? property.description.substring(0, 80) + '...' : 'No description available.'}</p>
                     <div className="flex justify-between items-center">
-                        <p className="text-xl font-extrabold text-blue-600 dark:text-blue-400">₹{property.price.toLocaleString('en-IN')}</p>
+                        <p className="text-xl font-extrabold text-blue-600 dark:text-blue-400">₹{Number(property.price).toLocaleString('en-IN')}</p>
                         <button onClick={() => onView(property)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
                             View Details
                         </button>
@@ -103,7 +103,7 @@
                 <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50 p-4 animate-fade-in-up" style={{ animationDuration: '0.3s' }} onClick={onClose}>
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden" onClick={e => e.stopPropagation()}>
                         <div className="relative">
-                            <img src={property.image || `https://placehold.co/800x400/cccccc/333?text=${encodeURIComponent(property.name)}`} alt={property.name} className="w-full h-72 object-cover"/>
+                            <img src={property.image || `https://placehold.co/800x400/cccccc/333?text=${encodeURIComponent(property.name)}`} alt={property.name} className="w-full h-72 object-cover" onError={(e) => { e.target.onerror = null; e.target.src=`https://placehold.co/800x400/ff0000/FFFFFF?text=Image+Error`; }}/>
                             <button onClick={onClose} className="absolute top-4 right-4 bg-white/20 text-white rounded-full p-2 hover:bg-white/40 transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
@@ -121,7 +121,7 @@
                                 {property.bathrooms && <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"><p className="font-bold text-lg">{property.bathrooms}</p><p className="text-sm text-gray-500 dark:text-gray-400">Bathrooms</p></div>}
                                 {property.area && <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"><p className="font-bold text-lg">{property.area} <span className="text-xs">sq.ft.</span></p><p className="text-sm text-gray-500 dark:text-gray-400">Area</p></div>}
                             </div>
-                            <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">₹{property.price.toLocaleString('en-IN')}</p>
+                            <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">₹{Number(property.price).toLocaleString('en-IN')}</p>
                         </div>
                     </div>
                 </div>,
@@ -131,15 +131,8 @@
 
         const AddPropertyForm = ({ onAdd, onCancel, isSubmitting }) => {
             const [property, setProperty] = useState({
-                name: '',
-                type: 'House',
-                location: '',
-                price: '',
-                bedrooms: '',
-                bathrooms: '',
-                area: '',
-                image: '',
-                description: ''
+                name: '', type: 'House', location: '', price: '',
+                bedrooms: '', bathrooms: '', area: '', image: '', description: ''
             });
 
             const handleChange = (e) => {
@@ -169,12 +162,7 @@
                             <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300 border-b pb-2">Property Details</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 <select name="type" value={property.type} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
-                                    <option>House</option>
-                                    <option>Apartment</option>
-                                    <option>Villa</option>
-                                    <option>Bungalow</option>
-                                    <option>Plot</option>
-                                    <option>Retail Store</option>
+                                    <option>House</option> <option>Apartment</option> <option>Villa</option> <option>Bungalow</option> <option>Plot</option> <option>Retail Store</option>
                                 </select>
                                 <input type="number" name="bedrooms" placeholder="Bedrooms" value={property.bedrooms} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                 <input type="number" name="bathrooms" placeholder="Bathrooms" value={property.bathrooms} onChange={handleChange} className="w-full p-4 rounded-lg bg-gray-100 dark:bg-gray-700 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -210,9 +198,6 @@
             <footer className="bg-white dark:bg-gray-800 mt-12">
                 <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-gray-400">
                     <p>&copy; {new Date().getFullYear()} PropertyFinder. All Rights Reserved.</p>
-                    <p className="mt-2">
-                        Designed & Developed by <a href="https://github.com/saarvesh0606" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">Saarvesh</a>.
-                    </p>
                 </div>
             </footer>
         );
@@ -227,25 +212,26 @@
             const [isDarkMode, setIsDarkMode] = useState(false);
             const [isSubmitting, setIsSubmitting] = useState(false);
             
-            const [status, setStatus] = useState('loading');
+            const [status, setStatus] = useState('loading'); // Start in 'loading' state
             const [error, setError] = useState(null);
 
+            // This useEffect hook now runs only once on component mount
             useEffect(() => {
                 const fetchProperties = async () => {
-                    setStatus('loading');
                     try {
                         const response = await fetch(`${API_BASE_URL}/api/properties`);
                         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                         const data = await response.json();
                         setProperties(data);
-                        setStatus('ready');
+                        setStatus('ready'); // Set status to ready AFTER data is fetched
                     } catch (e) {
                         setError("Could not connect to the backend. Please ensure the server is running.");
                         setStatus('error');
+                        console.error(e);
                     }
                 };
                 fetchProperties();
-            }, []);
+            }, []); // Empty dependency array means it runs once
 
             const filteredProperties = useMemo(() => properties.filter(p => 
                 (filterType === 'All' || p.type === filterType) &&
@@ -267,10 +253,12 @@
                     });
                     if (!response.ok) throw new Error('Failed to add property');
                     const addedProperty = await response.json();
+                    // Add the new property to the top of the list
                     setProperties(prev => [addedProperty, ...prev]);
                     setShowAddForm(false);
                 } catch (e) {
                     setError("Failed to add property. Please try again.");
+                    console.error(e);
                 } finally {
                     setIsSubmitting(false);
                 }
@@ -295,13 +283,17 @@
                 } catch (e) {
                     console.error("Error deleting property:", e);
                     setError("Could not delete property. Please try again.");
-                    setProperties(originalProperties);
+                    setProperties(originalProperties); // Revert UI on error
                 }
             };
             
             const renderContent = () => {
-                if (status === 'loading') return <div className="loader"></div>;
-                if (status === 'error') return <div className="text-center py-16 text-red-500"><h3 className="text-2xl font-semibold">Something went wrong</h3><p className="mt-2">{error}</p></div>;
+                if (status === 'loading') {
+                    return <div className="loader"></div>;
+                }
+                if (status === 'error') {
+                    return <div className="text-center py-16 text-red-500"><h3 className="text-2xl font-semibold">Something went wrong</h3><p className="mt-2">{error}</p></div>;
+                }
                 if (filteredProperties.length > 0) {
                     return (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 card-container">
@@ -321,7 +313,6 @@
 
             return (
                 <div className="flex flex-col min-h-screen">
-                    {/* Header */}
                     <header className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg sticky top-0 z-40 shadow-sm">
                         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="flex items-center justify-between h-20">
@@ -374,7 +365,6 @@
                             </Fragment>
                         )}
                         
-                        {/* Add Property Button for Mobile */}
                         {!showAddForm && (
                             <button onClick={() => setShowAddForm(true)} className="sm:hidden fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-full shadow-xl z-30 transition-transform transform hover:scale-110">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
